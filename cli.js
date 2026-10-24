@@ -1,4 +1,4 @@
-// toolkeeper 指令：status、deploy、diff、check、new、remove
+// toolkeeper 指令：status、deploy、diff、check、new、license、remove
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -75,6 +75,7 @@ function status() {
     console.log(`  執行端：${run}`);
     if (miss.length) console.log(`  settings：缺 ${miss.join('、')}（deploy ${name} 會補上）`);
     if (locals.length) console.log(`  本機特例：${locals.join('、')}`);
+    if (!L.hasLicense(tool.dir)) console.log(`  授權：缺 LICENSE（license ${name} 補上 MIT）`);
     console.log(`  公開檢查：${hits.length ? `${hits.length} 處（check ${name}）` : '通過'}`);
   }
 }
@@ -263,8 +264,16 @@ function create() {
   for (const [f, body] of Object.entries(files)) fs.writeFileSync(path.join(dir, f), body);
   L.git(dir, ['init', '-b', 'main']);
   const tool = L.loadTool(root, name);
+  L.ensureLicense(tool);
   console.log(`已建立 ${L.slash(dir)}（${skill ? 'skill' : 'hook／指令工具'}）｜pre-push 檢查：${L.installPrePush(tool)}`);
   console.log(`接著：寫程式${skill ? '與 SKILL.md' : '，在 deploy.json 的 hooks 填上要掛的事件'} → deploy ${name} 試用 → commit → gh repo create 建遠端 → push`);
+}
+
+function license() {
+  for (const n of names(arg)) {
+    const tool = L.loadTool(ROOT, n);
+    console.log(`${n}：${L.ensureLicense(tool) ? '已加上 MIT 授權（LICENSE），記得 commit' : '已有授權檔，不動'}`);
+  }
 }
 
 function remove() {
@@ -295,9 +304,10 @@ const HELP = `用法：node cli.js <指令>
                                  repo → 執行端；--force 覆蓋直接改過的檔（先備份）；--prune 刪除來路不明的檔
   diff <名稱>                    執行端與 repo 的差異
   check <名稱|all> [--history]   公開檢查（工作目錄；--history 掃全部 git 歷史）
-  new <名稱> [--skill]           建立新工具 repo
+  new <名稱> [--skill]           建立新工具 repo（含 MIT 授權）
+  license <名稱|all>             缺授權檔的 repo 補上 MIT 授權
   remove <名稱> [--purge]        從執行端移除並取消 settings 註冊`;
 
-const cmds = { status, deploy, diff, check, new: create, remove };
+const cmds = { status, deploy, diff, check, new: create, license, remove };
 if (cmds[cmd]) cmds[cmd]();
 else console.log(HELP);

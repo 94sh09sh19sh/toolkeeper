@@ -7,7 +7,7 @@
 - 執行端只放跑得動所需的檔案（不含 README、測試、repo 設定），hook 註冊到 `settings.json` 也由 `deploy` 處理。
 - 設定與特例分三層：repo 預設（公開）、執行端 `*.local.*`（個人，部署不覆蓋）、專案的 `.claude/`（專案特例，跟著專案走）。
 - `check` 掃本機使用者名稱、email、金鑰與你的私人詞清單；`deploy` 會在每個工具 repo 裝 pre-push hook，推上 GitHub 前自動檢查。
-- 新工具用 `new` 建立，之後跟現有工具同一套流程。
+- 新工具用 `new` 建立（自動加上 MIT 授權），之後跟現有工具同一套流程。
 
 ## 為什麼是 repo → 執行端
 - repo 有 git 歷史，改壞了能回復；執行端沒有。
@@ -45,11 +45,12 @@
 - `test`：部署前在 repo 裡執行的指令，失敗就不部署。所有 `.js` 也會先跑 `node --check`。
 
 ## 指令
-- `node ~/.claude/toolkeeper/cli.js status`：每個工具的 repo 狀態、執行端是否同步、缺哪些 hook 註冊、本機特例檔行數、公開檢查結果。
+- `node ~/.claude/toolkeeper/cli.js status`：每個工具的 repo 狀態、執行端是否同步、缺哪些 hook 註冊、本機特例檔行數、缺不缺授權檔、公開檢查結果。
 - `deploy <名稱|all> [--dry-run] [--force] [--prune]`：repo → 執行端。`--dry-run` 只列變更；`--force` 覆蓋被直接改過的檔；`--prune` 刪掉執行端來路不明的檔（都會先備份）。
 - `diff <名稱>`：執行端與 repo 的差異（`-` 是執行端，`+` 是 repo）。
 - `check <名稱|all> [--history]`：公開檢查工作目錄；`--history` 改掃整個 git 歷史。確定可公開的行加上註解 `toolkeeper: allow`。
-- `new <名稱> [--skill]`：建立新工具 repo（README、deploy.json、.gitignore、pre-push hook）。
+- `new <名稱> [--skill]`：建立新工具 repo（README、LICENSE〔MIT〕、deploy.json、.gitignore、pre-push hook）。
+- `license <名稱|all>`：缺授權檔的 repo 補上 MIT 授權（著作權人取 git 的 `user.name`）；已有授權檔的不動。
 - `remove <名稱> [--purge]`：從執行端移除並取消 settings 註冊；`--purge` 連狀態與本機設定一起刪。
 
 ## 日常流程

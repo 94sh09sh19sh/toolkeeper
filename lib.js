@@ -359,6 +359,43 @@ function installPrePush(tool) {
   return '已安裝';
 }
 
+// ---------- 授權：公開的工具 repo 一律用 MIT ----------
+
+const hasLicense = (dir) => fs.readdirSync(dir).some((f) => /^(licen[cs]e|copying)(\.|$)/i.test(f));
+
+function mitLicense(holder, year = new Date().getFullYear()) {
+  return `MIT License
+
+Copyright (c) ${year} ${holder}
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+`;
+}
+
+// 缺授權檔就補上 MIT，著作權人用 git 的 user.name；已有授權檔就不動
+function ensureLicense(tool) {
+  if (hasLicense(tool.dir)) return false;
+  const holder = git(tool.dir, ['config', 'user.name']).out.trim() || 'the authors';
+  fs.writeFileSync(path.join(tool.dir, 'LICENSE'), mitLicense(holder));
+  return true;
+}
+
 // ---------- 公開檢查 ----------
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -443,5 +480,5 @@ module.exports = {
   loadLocalConfig, repoRoot, listTools, loadTool, loadLock, saveLock,
   sourceFiles, runtimeFiles, plan, removeEmptyDirs, repoState,
   hookCommand, wantedHooks, syncSettings, missingHooks, installPrePush,
-  privateTerms, scanTree, scanHistory,
+  hasLicense, ensureLicense, privateTerms, scanTree, scanHistory,
 };
