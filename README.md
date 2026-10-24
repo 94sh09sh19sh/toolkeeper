@@ -38,7 +38,7 @@
 }
 ```
 - `target`：部署到 `~/.claude/` 底下的相對路徑；skill 用 `skills/<名稱>`。
-- `hooks`：要註冊的 hook；`command` 由 `script` 自動組成 `node <執行端絕對路徑>`。
+- `hooks`：要註冊的 hook；`command` 由 `script` 自動組成 `node <執行端絕對路徑>`。可加 `"async": true` 或 `"asyncRewake": true`（背景執行；後者 exit 2 時會喚醒 session）。
 - `statusLine`：狀態列腳本；已被別的工具占用時不覆蓋，除非 `--force`。
 - `exclude`：額外不部署的檔案。預設已排除 `.git/`、`.gitignore`、`README*`、`LICENSE*`、`CHANGELOG*`、`deploy.json`、`test/`、`tests/`、`node_modules/`、`state/`、`*.local.*`。
 - `keep`：額外的執行端專有路徑，部署永遠不碰。預設是 `state/` 與 `*.local.*`。

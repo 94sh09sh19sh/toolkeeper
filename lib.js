@@ -220,6 +220,8 @@ function wantedHooks(tool) {
       command: hookCommand(tool, h.script),
       ...(h.timeout ? { timeout: h.timeout } : {}),
       ...(h.statusMessage ? { statusMessage: h.statusMessage } : {}),
+      ...(h.async ? { async: true } : {}),
+      ...(h.asyncRewake ? { asyncRewake: true } : {}),
     },
   }));
 }
